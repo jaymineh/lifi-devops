@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-bird
+spec:
+  selector:
+    app: bird
+  ports:
+    - protocol: TCP
+      port: {{ .Values.bird.service.port }}
+      targetPort: {{ .Values.bird.service.targetPort }}

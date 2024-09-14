@@ -1,0 +1,17 @@
+replicaCount: 2
+image:
+  repository: bird
+  tag: latest
+service:
+  port: 80
+  targetPort: 4201
+
+ingress:
+  enabled: true
+  className: traefik
+  hosts:
+    - host: ""
+      paths:
+        - path: /bird
+          pathType: Prefix
+          service: bird

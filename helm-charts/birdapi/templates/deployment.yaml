@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-bird
+  labels:
+    app: bird
+spec:
+  replicas: {{ .Values.bird.replicaCount }}
+  selector:
+    matchLabels:
+      app: bird
+  template:
+    metadata:
+      labels:
+        app: bird
+    spec:
+      containers:
+      - name: bird
+        image: "{{ .Values.bird.image.repository }}:{{ .Values.bird.image.tag }}"
+        ports:
+        - containerPort: {{ .Values.bird.service.targetPort }}

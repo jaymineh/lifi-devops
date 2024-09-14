@@ -1,0 +1,30 @@
+replicaCount: 2
+image:
+  repository: jaymineh/birdimage
+  tag: 0.3
+service:
+  port: 80
+  targetPort: 4200
+
+ingress:
+  enabled: true
+  className: traefik
+  hosts:
+    - host: ec2-3-238-18-44.compute-1.amazonaws.com
+      paths:
+        - path: /birdimage
+          pathType: Prefix
+          service: birdimage
+
+serviceAccount:
+  create: true  # or false, depending on your needs
+  name: ""
+  annotations: {}
+  automount: true
+
+autoscaling:
+  enabled: false               # or true, depending on your needs
+  minReplicas: 1                # Set appropriate minReplicas
+  maxReplicas: 3                # Set appropriate maxReplicas
+  targetCPUUtilizationPercentage: 80  # Adjust based on your requirements
+  targetMemoryUtilizationPercentage: 70  # Adjust based on your requirements
