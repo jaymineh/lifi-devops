@@ -1,7 +1,7 @@
 replicaCount: 2
 image:
-  repository: bird
-  tag: latest
+  repository: jaymineh/birdapi
+  tag: 0.4
 service:
   port: 80
   targetPort: 4201
@@ -10,8 +10,21 @@ ingress:
   enabled: true
   className: traefik
   hosts:
-    - host: ""
+    - host: ec2-3-238-18-44.compute-1.amazonaws.com
       paths:
         - path: /bird
           pathType: Prefix
           service: bird
+
+serviceAccount:
+  create: true  # or false, depending on your needs
+  name: ""
+  annotations: {}
+  automount: true
+
+autoscaling:
+  enabled: false               # or true, depending on your needs
+  minReplicas: 1                # Set appropriate minReplicas
+  maxReplicas: 3                # Set appropriate maxReplicas
+  targetCPUUtilizationPercentage: 80  # Adjust based on your requirements
+  targetMemoryUtilizationPercentage: 70  # Adjust based on your requirements

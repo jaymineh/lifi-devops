@@ -25,12 +25,19 @@ func defaultBird(err error) Bird {
 }
 
 func getBirdImage(birdName string) (string, error) {
-    res, err := http.Get(fmt.Sprintf("http://localhost:4200?birdName=%s", url.QueryEscape(birdName)))
+    // Update the URL to use the Kubernetes service name and port
+    url := fmt.Sprintf("http://birdimageapi-birdimage:80?birdName=%s", url.QueryEscape(birdName))
+    
+    res, err := http.Get(url)
     if err != nil {
         return "", err
     }
+    defer res.Body.Close()  // Always close the body when done
     body, err := io.ReadAll(res.Body)
-    return string(body), err
+    if err != nil {
+        return "", err
+    }
+    return string(body), nil
 }
 
 func getBirdFactoid() Bird {

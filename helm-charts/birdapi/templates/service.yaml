@@ -7,5 +7,5 @@ spec:
     app: bird
   ports:
     - protocol: TCP
-      port: {{ .Values.bird.service.port }}
-      targetPort: {{ .Values.bird.service.targetPort }}
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}

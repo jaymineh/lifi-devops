@@ -5,7 +5,7 @@ metadata:
   labels:
     app: bird
 spec:
-  replicas: {{ .Values.bird.replicaCount }}
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: bird
@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: bird
-        image: "{{ .Values.bird.image.repository }}:{{ .Values.bird.image.tag }}"
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         ports:
-        - containerPort: {{ .Values.bird.service.targetPort }}
+        - containerPort: {{ .Values.service.targetPort }}
