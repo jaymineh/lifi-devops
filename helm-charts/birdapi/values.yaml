@@ -10,7 +10,7 @@ ingress:
   enabled: true
   className: traefik
   hosts:
-    - host: ec2-3-238-18-44.compute-1.amazonaws.com
+    - host: ec2-35-169-116-208.compute-1.amazonaws.com
       paths:
         - path: /bird
           pathType: Prefix
