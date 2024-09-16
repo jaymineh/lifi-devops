@@ -4,6 +4,10 @@ metadata:
   name: {{ .Release.Name }}-birdimage
   labels:
     app: birdimage
+    annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/metrics"
+    prometheus.io/port: "http"
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -18,4 +22,4 @@ spec:
       - name: birdimage
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         ports:
-        - containerPort: {{ .Values.service.targetPort }}
+        - containerPort: {{ .Values.service.port }}

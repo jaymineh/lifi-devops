@@ -1,23 +1,16 @@
-# Use the official Golang image
-FROM golang:1.22.5-alpine
-
-# Set the working directory
+FROM golang:1.22.5-alpine AS builder
 WORKDIR /app
-
-# Copy go mod and sum files
-COPY go.mod ./
-
-# Download all dependencies
+COPY go.mod go.sum ./
 RUN go mod download
-
-# Copy the source code
 COPY . .
-
-# Build the application
 RUN go build -o birdImage
 
-# Expose port 4200
+FROM alpine:3.18
+RUN addgroup -S birdimageapi && adduser -S birdimageapi -G birdimageapi
+USER birdimageapi
+
+WORKDIR /app
+COPY --from=builder /app/birdImage .
 EXPOSE 4200
 
-# Run the executable
 CMD ["./birdImage"]

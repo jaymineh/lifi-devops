@@ -4,16 +4,46 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"os"
+	"time"
 	"io"
 	"math/rand/v2"
 	"net/http"
 	"net/url"
+	"github.com/prometheus/client_golang/prometheus"
+    "github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type Bird struct {
 	Name        string
 	Description string
 	Image       string
+}
+
+var (
+	// Declare the metrics to be used.
+    httpRequestsTotalbirdApi = prometheus.NewCounterVec(
+        prometheus.CounterOpts{
+            Name: "http_requests_total_to_birdapi",
+            Help: "Total number of HTTP requests to birdapi",
+        },
+        []string{"method", "endpoint", "status"},
+    )
+
+    httpRequestDurationbirdApi = prometheus.NewHistogramVec(
+        prometheus.HistogramOpts{
+            Name:    "http_request_duration_seconds_to_birdapi",
+            Help:    "Duration of HTTP requests in seconds to birdapi",
+            Buckets: prometheus.DefBuckets,
+        },
+        []string{"method", "endpoint"},
+    )
+)
+
+func init() {
+	// Register the metrics
+	prometheus.MustRegister(httpRequestsTotalbirdApi)
+	prometheus.MustRegister(httpRequestDurationbirdApi)
 }
 
 func defaultBird(err error) Bird {
@@ -32,7 +62,7 @@ func getBirdImage(birdName string) (string, error) {
     if err != nil {
         return "", err
     }
-    defer res.Body.Close()  // Always close the body when done
+    defer res.Body.Close()
     body, err := io.ReadAll(res.Body)
     if err != nil {
         return "", err
@@ -67,6 +97,14 @@ func getBirdFactoid() Bird {
 }
 
 func bird(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
+    defer func() {
+        duration := time.Since(start)
+        status := http.StatusOK
+		httpRequestDurationbirdApi.WithLabelValues(r.Method, "/").Observe(duration.Seconds())
+        httpRequestsTotalbirdApi.WithLabelValues(r.Method, "/", fmt.Sprint(status)).Inc()
+    }()
+
 	var buffer bytes.Buffer
 	json.NewEncoder(&buffer).Encode(getBirdFactoid())
 	io.WriteString(w, buffer.String())
@@ -74,5 +112,6 @@ func bird(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/", bird)
+	http.Handle("/metrics", promhttp.Handler())
 	http.ListenAndServe(":4201", nil)
 }
