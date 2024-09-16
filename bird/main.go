@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"os"
 	"time"
 	"io"
 	"math/rand/v2"
@@ -12,6 +11,7 @@ import (
 	"net/url"
 	"github.com/prometheus/client_golang/prometheus"
     "github.com/prometheus/client_golang/prometheus/promhttp"
+
 )
 
 type Bird struct {
@@ -56,7 +56,7 @@ func defaultBird(err error) Bird {
 
 func getBirdImage(birdName string) (string, error) {
     // Update the URL to use the Kubernetes service name and port
-    url := fmt.Sprintf("http://birdimageapi-birdimage:80?birdName=%s", url.QueryEscape(birdName))
+    url := fmt.Sprintf("http://birdimageapi:4200?birdName=%s", url.QueryEscape(birdName))
     
     res, err := http.Get(url)
     if err != nil {

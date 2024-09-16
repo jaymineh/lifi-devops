@@ -1,14 +1,15 @@
 replicaCount: 2
 image:
   repository: jaymineh/birdapi
-  tag: 0.5
+  tag: 0.7
+  pullPolicy: Always
 service:
   type: NodePort
   port: 4201
   targetPort: 30001
 
 serviceAccount:
-  create: true  # or false, depending on your needs
+  create: true 
   name: birdapi-sa
   annotations: {}
   automount: true

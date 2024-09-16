@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-bird
+  name: {{ .Release.Name }}
   labels:
     app: bird
   annotations:
@@ -23,3 +23,19 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         ports:
         - containerPort: {{ .Values.service.port }}
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: {{ .Values.service.port }}
+          initialDelaySeconds: 5
+          periodSeconds: 10
+         readinessProbe:
+          httpGet:
+            path: /metrics
+            port: {{ .Values.service.port }}
+          initialDelaySeconds: 3
+          periodSeconds: 5
+         securityContext:
+          runAsUser: 1000
+          runAsGroup: 3000
+      restartPolicy: Always

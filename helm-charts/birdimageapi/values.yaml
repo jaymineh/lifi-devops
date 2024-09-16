@@ -1,7 +1,8 @@
 replicaCount: 2
 image:
   repository: jaymineh/birdimage
-  tag: 0.5
+  tag: 0.7
+  pullPolicy: Always
 service:
   type: NodePort
   port: 4200
