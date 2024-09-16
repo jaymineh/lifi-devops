@@ -29,13 +29,13 @@ spec:
             port: {{ .Values.service.port }}
           initialDelaySeconds: 5
           periodSeconds: 10
-         readinessProbe:
+        readinessProbe:
           httpGet:
             path: /metrics
             port: {{ .Values.service.port }}
           initialDelaySeconds: 3
           periodSeconds: 5
-         securityContext:
+        securityContext:
           runAsUser: 1000
           runAsGroup: 3000
       restartPolicy: Always
