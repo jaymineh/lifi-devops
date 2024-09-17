@@ -5,8 +5,8 @@ resource "aws_security_group" "lifinance_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow SSH access from anywhere"
+    cidr_blocks = ["18.215.27.25/32"] # Allow SSH access only from the bastion server
+    description = "Allow SSH access from the bastion server"
   }
 
   ingress {
