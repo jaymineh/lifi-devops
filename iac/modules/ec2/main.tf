@@ -6,8 +6,7 @@ resource "aws_instance" "lifinance_server" {
   key_name        = var.key_name
 }
 
-resource "aws_eip" "lifinance_eip" {
-  vpc = true 
+resource "aws_eip" "lifinance_eip" { 
   instance = aws_instance.lifinance_server.id
   tags = {
     Name = "lifinance-eip"
