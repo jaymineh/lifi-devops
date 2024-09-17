@@ -96,7 +96,7 @@ This is where the entire infrastrure comes together using code. Here, Terraform 
 
 After a while, Terraform would finish provisioning the instances and you would see a successful message.
 
-![Terraform Success](<terraform apply.png>)
+![Terraform Success](images/terraform-apply.png)
 
 **Step 4 - Running Ansible Script**
 
