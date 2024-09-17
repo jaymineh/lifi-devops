@@ -67,6 +67,18 @@
         mode: '0644'
       when: not datasource_file.stat.exists
 
+    - name: Check if Grafana dashboard provisioning file exists
+      stat:
+        path: /etc/grafana/provisioning/dashboards/dashboard.yml
+      register: dashboard_provisioning_file
+
+    - name: Copy Grafana dashboard provisioning file
+      copy:
+        src: /home/ubuntu/lifi-devops/iac/ansible/grafana/dashboards/dashboard.yml
+        dest: /etc/grafana/provisioning/dashboards/dashboard.yml
+        mode: '0644'
+      when: not dashboard_provisioning_file.stat.exists
+
     - name: Check if Grafana dashboard JSON file exists
       stat:
         path: /var/lib/grafana/dashboards/birdapi-dashboard.json
@@ -84,7 +96,7 @@
         helm upgrade --install prometheus-operator prometheus-community/kube-prometheus-stack \
         --set prometheus.service.type=NodePort \
         --set prometheus.service.nodePort=30003 \
-        --set namespace=monitoring \
+        --namespace monitoring \
         --create-namespace \
         --wait
       environment:
@@ -96,7 +108,7 @@
         --set adminPassword='your-admin-password' \
         --set service.type=NodePort \
         --set service.nodePort=30004 \
-        --set namespace=monitoring \
+        --namespace monitoring \
         --set extraVolumes[0].name=grafana-provisioning \
         --set extraVolumes[0].hostPath.path=/etc/grafana/provisioning \
         --set extraVolumes[0].hostPath.type=Directory \
@@ -125,7 +137,7 @@
 
     - name: Deploy bird API using Helm
       shell: |
-        helm upgrade --install birdapi /home/ubuntu/lifi-devops/helm-charts/bird/ \
+        helm upgrade --install birdapi /home/ubuntu/lifi-devops/helm-charts/birdapi/ \
         --namespace bird \
       environment:
         KUBECONFIG: "/etc/rancher/k3s/k3s.yaml"
