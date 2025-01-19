@@ -133,9 +133,12 @@
 
     - name: Install ArgoCD
       shell: |
-        helm upgrade --install argocd-demo argo/argocd -f /home/ubuntu/lifi-devops/iac/argocd-custom-values.yaml \
-        --namespace argocd
-        --create-namespace
+        helm upgrade --install argocd-demo argo/argocd \
+        --set prometheus.service.type=NodePort \
+        --set prometheus.service.nodePort=30005 \
+        --namespace argocd \
+        --create-namespace \
+        --wait
       environment:
         KUBECONFIG: "/etc/rancher/k3s/k3s.yaml"
 
