@@ -133,7 +133,7 @@
 
     - name: Install ArgoCD
       shell: |
-        helm upgrade --install argocd-demo argo/argocd \
+        helm upgrade --install argocd-demo argo/argo-cd \
         --set prometheus.service.type=NodePort \
         --set prometheus.service.nodePort=30005 \
         --namespace argocd \
