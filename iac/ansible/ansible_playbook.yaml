@@ -124,7 +124,6 @@
         --set extraVolumeMounts[0].mountPath=/etc/grafana/provisioning \
         --set extraVolumeMounts[1].name=grafana-dashboard-vol \
         --set extraVolumeMounts[1].mountPath=/var/lib/grafana/dashboards \
-        --wait
       environment:
         KUBECONFIG: "/etc/rancher/k3s/k3s.yaml"
 
