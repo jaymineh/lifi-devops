@@ -41,6 +41,14 @@ resource "aws_security_group" "lifinance_sg" {
     description = "Allow HTTP traffic for grafana"
   }
 
+  ingress {
+    from_port   = 30005
+    to_port     = 30005
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow HTTP traffic for ArgoCD"
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
