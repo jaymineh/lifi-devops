@@ -79,7 +79,7 @@
 
     - name: Copy Grafana dashboard provisioning file
       copy:
-        src: /home/ubuntu/lifi-devops/iac/ansible/grafana/dashboards/dashboard.yml
+        src: /home/ubuntu/lifi-devops/iac/ansible/grafana/dashboard/dashboard.yml
         dest: /etc/grafana/provisioning/dashboards/dashboard.yml
         mode: '0644'
       when: not dashboard_provisioning_file.stat.exists
