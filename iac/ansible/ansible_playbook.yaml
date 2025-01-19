@@ -127,9 +127,9 @@
       environment:
         KUBECONFIG: "/etc/rancher/k3s/k3s.yaml"
 
-    - name: Wait for Grafana pod to be ready
-      shell: kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=grafana  --timeout=120s
-      changed_when: false
+    # - name: Wait for Grafana pod to be ready
+    #   shell: kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=grafana  --timeout=120s
+    #   changed_when: false
 
     - name: Install ArgoCD
       shell: |
