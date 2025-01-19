@@ -22,6 +22,11 @@ resource "aws_instance" "lifinance" {
 	tags = {
 		Name = "lifinance"
 	}
+  root_block_device {
+    volume_size = 30
+    volume_type = "gp3"
+    encrypted = true
+  }
 }
 
 resource "aws_eip" "lifinance_eip" {
