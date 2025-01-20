@@ -136,7 +136,7 @@
       shell: |
         helm upgrade --install argocd-demo argo/argo-cd \
         --set server.service.type=NodePort \
-        --set server.service.nodePort=30005 \
+        --set server.service.nodePorts.https=30005 \
         --namespace argocd \
         --create-namespace \
         --wait
