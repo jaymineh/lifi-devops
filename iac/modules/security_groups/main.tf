@@ -69,3 +69,4 @@ resource "aws_security_group" "lifinance_sg" {
     Name = "lifinance_sg"
   }
 }
+
