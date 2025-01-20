@@ -4,7 +4,7 @@ metadata:
   name: {{ .Release.Name }}
   labels:
     app: birdimage
-    annotations:
+  annotations:
     prometheus.io/scrape: "true"
     prometheus.io/path: "/metrics"
     prometheus.io/port: "4200"
