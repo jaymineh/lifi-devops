@@ -12,7 +12,7 @@ spec:
     helm:
       values: |
         ingress:
-          enabled: true
+          enabled: false
         autoscaling:
           enabled: true
           minReplicas: 1
