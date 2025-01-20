@@ -1,6 +1,6 @@
 apiVersion: 1
 datasources:
-  - name: prometheus-apl
+  - name: Prometheus
     type: prometheus
     access: proxy
     url: http://prometheus-operator-kube-p-prometheus.monitoring.svc.cluster.local:9090
