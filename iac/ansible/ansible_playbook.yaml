@@ -70,7 +70,8 @@
         src: /home/ubuntu/lifi-devops/iac/ansible/grafana/dashboard/datasource.yml
         dest: /etc/grafana/provisioning/datasources/datasource.yml
         mode: '0644'
-      when: not datasource_file.stat.exists
+      # when: not datasource_file.stat.exists
+      force: yes
 
     - name: Check if Grafana dashboard provisioning file exists
       stat:
@@ -126,7 +127,7 @@
         --set extraVolumeMounts[1].mountPath=/var/lib/grafana/dashboards \
         --set persistence.enabled=true \
         --set datasources.datasources.yaml.apiVersion=1 \
-        --set datasources.datasources.yaml.datasources[0].name=Prometheus \
+        --set datasources.datasources.yaml.datasources[0].name=DS_PROMETHEUS-APL \
         --set datasources.datasources.yaml.datasources[0].type=prometheus \
         --set datasources.datasources.yaml.datasources[0].url=http://prometheus-operator-kube-p-prometheus.monitoring.svc.cluster.local:9090 \
         --set datasources.datasources.yaml.datasources[0].access=proxy \
