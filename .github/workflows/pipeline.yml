@@ -36,7 +36,7 @@ jobs:
               uses: aquasecurity/tfsec-action@v1.0.0
               continue-on-error: true
               with:
-                working-directory: iac
+                args: './iac/...'
 
     determine-changes:
         needs: security-scan
