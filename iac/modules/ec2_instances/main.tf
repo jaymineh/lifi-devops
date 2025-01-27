@@ -1,5 +1,5 @@
 resource "aws_instance" "lifinance" {
-  ami = "ami-0e86e20dae9224db8"
+  ami = var.ami_id
   instance_type = var.instance_type
   subnet_id = var.subnet_id
   security_groups = [var.security_group_id]
