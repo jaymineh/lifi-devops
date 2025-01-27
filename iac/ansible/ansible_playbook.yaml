@@ -140,8 +140,7 @@
     - name: Install ArgoCD
       shell: |
         helm upgrade --install argocd-demo argo/argo-cd \
-        --set server.service.type=NodePort \
-        --set server.service.nodePorts.https=30005 \
+        -f /home/ubuntu/lifi-devops/helm-charts/argocd-values.yaml \
         --namespace argocd \
         --create-namespace \
         --wait
