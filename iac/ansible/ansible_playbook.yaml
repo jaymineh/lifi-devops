@@ -92,9 +92,11 @@
 
     - name: Copy Grafana dashboard JSON files
       copy:
-        src: /home/ubuntu/lifi-devops/iac/ansible/grafana/dashboard/*.json
+        src: "{{ item }}"
         dest: /var/lib/grafana/dashboards/
         mode: '0644'
+      with_fileglob:
+        - "/home/ubuntu/lifi-devops/iac/ansible/grafana/dashboard/*.json"
       when: true
 
     - name: Install Prometheus Operator with Helm
