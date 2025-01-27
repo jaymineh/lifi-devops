@@ -25,11 +25,6 @@ variable "ami_id" {
   default = "ami-0e86e20dae9224db8"
 }
 
-variable "github_repo" {
-	type        = string
-	default     = "https://github.com/jaymineh/lifi-devops.git"
-}
-
 variable "private_key_path" {
   type = string
 }

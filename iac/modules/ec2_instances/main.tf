@@ -11,7 +11,6 @@ resource "aws_instance" "lifinance" {
     sudo apt install software-properties-common -y
     sudo add-apt-repository --yes --update ppa:ansible/ansible
     sudo apt install git ansible -y
-    cd /home/ubuntu && git clone https://github.com/jaymineh/lifi-devops.git
   EOF
   connection {
     type        = "ssh"
