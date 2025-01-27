@@ -9,6 +9,7 @@ variable "allowed_ssh_cidr" {
 
 variable "ami_id" {
   description = "AMI ID for the EC2 instance"
+  default = "ami-0e86e20dae9224db8"
 }
 
 variable "github_repo" {
