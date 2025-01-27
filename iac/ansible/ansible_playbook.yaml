@@ -111,27 +111,10 @@
     - name: Install Grafana with Helm
       shell: |
         helm upgrade --install grafana grafana/grafana \
-        --set adminPassword='your-admin-password' \
+        --set adminPassword='adminpassword' \
         --set service.type=NodePort \
         --set service.nodePort=30004 \
         --namespace monitoring \
-        --set extraVolumes[0].name=grafana-provisioning \
-        --set extraVolumes[0].hostPath.path=/etc/grafana/provisioning \
-        --set extraVolumes[0].hostPath.type=Directory \
-        --set extraVolumes[1].name=grafana-dashboard-vol \
-        --set extraVolumes[1].hostPath.path=/var/lib/grafana/dashboards \
-        --set extraVolumes[1].hostPath.type=Directory \
-        --set extraVolumeMounts[0].name=grafana-provisioning \
-        --set extraVolumeMounts[0].mountPath=/etc/grafana/provisioning \
-        --set extraVolumeMounts[1].name=grafana-dashboard-vol \
-        --set extraVolumeMounts[1].mountPath=/var/lib/grafana/dashboards \
-        --set persistence.enabled=true \
-        --set datasources.datasources.yaml.apiVersion=1 \
-        --set datasources.datasources.yaml.datasources[0].name=DS_PROMETHEUS-APL \
-        --set datasources.datasources.yaml.datasources[0].type=prometheus \
-        --set datasources.datasources.yaml.datasources[0].url=http://prometheus-operator-kube-p-prometheus.monitoring.svc.cluster.local:9090 \
-        --set datasources.datasources.yaml.datasources[0].access=proxy \
-        --set datasources.datasources.yaml.datasources[0].isDefault=true \
         --wait \
         --timeout 10m
       environment:
