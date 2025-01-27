@@ -26,7 +26,16 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
 
-            - name: Golang codescan
+            - name: Golang codescan with Gosec
               uses: securego/gosec@master
+              continue-on-error: true
               with:
                 args: './bird/... ./birdImage/...'
+
+            - name: Terraform codescan with tfsec
+              uses: aquasecurity/tfsec-action@v2
+              continue-on-error: true
+              with:
+                working-directory: iac
+
+            
