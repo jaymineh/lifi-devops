@@ -33,7 +33,7 @@ jobs:
                 args: './bird/... ./birdImage/...'
 
             - name: Terraform codescan with tfsec
-              uses: aquasecurity/tfsec-action@v1
+              uses: aquasecurity/tfsec-action@v1.0.0
               continue-on-error: true
               with:
                 working-directory: iac
