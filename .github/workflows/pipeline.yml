@@ -1,0 +1,32 @@
+name: CI/CD Pipeline
+
+on:
+    push:
+        branches: [main]
+        paths:
+            - 'bird/**'
+            - 'birdImage/**'
+            - 'iac/**'
+            - 'helm-charts/**'
+            - '.github/workflows/**'
+
+env:
+    DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+    DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    AWS_REGION: your-aws-region
+    EC2_IP: ${{ secrets.EC2_IP }}
+    SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+jobs:
+    security-scan:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Golang codescan
+              uses: securego/gosec@master
+              with:
+                args: './bird/... ./birdImage/...'
