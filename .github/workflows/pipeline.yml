@@ -38,4 +38,23 @@ jobs:
               with:
                 working-directory: iac
 
+    determine-changes:
+        needs: security-scan
+        runs-on: ubuntu-latest
+        outputs:
+            bird-api: ${{ steps.check-bird-api.outputs.changed }}
+            birdimage-api: ${{ steps.check-birdimage-api.outputs.changed }}
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                fetch-depth: 2
+
+            - name: Check for changes
+              id: check_changes
+              run: |
+                git diff --name-only HEAD^ HEAD > changes.txt
+                echo "bird-api=$(grep -q 'bird/' changes.txt && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
+                echo "birdimage-api=$(grep -q 'birdImage/' changes.txt && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
+
+
             
