@@ -70,8 +70,7 @@
         src: /home/ubuntu/lifi-devops/iac/ansible/grafana/dashboard/datasource.yml
         dest: /etc/grafana/provisioning/datasources/datasource.yml
         mode: '0644'
-      # when: not datasource_file.stat.exists
-        force: yes
+      when: not datasource_file.stat.exists
 
     - name: Check if Grafana dashboard provisioning file exists
       stat:
@@ -85,17 +84,18 @@
         mode: '0644'
       when: not dashboard_provisioning_file.stat.exists
 
-    - name: Check if Grafana dashboard JSON file exists
-      stat:
-        path: /var/lib/grafana/dashboards/birdapi-dashboard.json
-      register: dashboard_json_file
+    - name: Check if Grafana dashboard JSON files exist
+      file:
+        path: /var/lib/grafana/dashboards
+        state: directory
+        mode: '0755'
 
-    - name: Copy Grafana dashboard JSON file
+    - name: Copy Grafana dashboard JSON files
       copy:
-        src: /home/ubuntu/lifi-devops/iac/ansible/grafana/dashboard/Go_dashboard.json
-        dest: /var/lib/grafana/dashboards/Go_dashboard.json
+        src: /home/ubuntu/lifi-devops/iac/ansible/grafana/dashboard/*.json
+        dest: /var/lib/grafana/dashboards/
         mode: '0644'
-      when: not dashboard_json_file.stat.exists
+      when: true
 
     - name: Install Prometheus Operator with Helm
       shell: |
