@@ -71,7 +71,7 @@
         dest: /etc/grafana/provisioning/datasources/datasource.yml
         mode: '0644'
       # when: not datasource_file.stat.exists
-      force: yes
+        force: yes
 
     - name: Check if Grafana dashboard provisioning file exists
       stat:
