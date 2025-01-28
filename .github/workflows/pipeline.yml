@@ -81,7 +81,7 @@ jobs:
             - name: Build and Push
               uses: docker/build-push-action@v4
               if: |
-                (matrix.api == 'bird-api' && needs.determine-changes.outputs.bird-api == 'true')
+                (matrix.api == 'bird-api' && needs.determine-changes.outputs.bird-api == 'true') ||
                 (matrix.api == 'birdimage-api' && needs.determine-changes.outputs.birdimage-api == 'true')
               with:
                 context: ./${{ matrix.api }}-api
