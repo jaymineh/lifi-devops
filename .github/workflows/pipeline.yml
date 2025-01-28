@@ -88,6 +88,10 @@ jobs:
                 push: true
                 tags: ${{ env.DOCKERHUB_USERNAME }}/${{ matrix.api }}-api:${{ github.sha }}
 
+    deploy:
+        needs: [build-and-push-image, determine-changes]
+        runs-on: ubuntu-latest
+
 
 
             
