@@ -92,7 +92,24 @@ jobs:
         needs: [build-and-push-image, determine-changes]
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Download built APIs
+              uses: actions/download-artifact@v3
+              with:
+                name: built-apis
+
+            - name: Update Helm charts
+              run: |
+                if [ -f built-apis.txt ]; then
+                    while read -r api; do
+                        values_file=
+                        image_tag="${{ github.sha }}"
+                        yq eval ".image.tag = \"$image_tag\"" -i $values_file
+                        yq eval ".image.repository = \"${{ env.DOCKERHUB_USERNAME }}/$api\"" -i $values_file
+                    done < built-apis.txt
+                fi
 
 
 
