@@ -37,8 +37,8 @@ jobs:
         needs: security-scan
         runs-on: ubuntu-latest
         outputs:
-            bird-api: ${{ steps.check-bird-api.outputs.changed }}
-            birdimage-api: ${{ steps.check-birdimage-api.outputs.changed }}
+            birdapi_changed: ${{ steps.check_changes.outputs.birdapi_changed }}
+            birdimageapi_changed: ${{ steps.check-changes.outputs.birdimageapi_changed }}
         steps:
             - uses: actions/checkout@v4
               with:
@@ -48,15 +48,15 @@ jobs:
               id: check_changes
               run: |
                 git diff --name-only HEAD^ HEAD > changes.txt
-                echo "bird-api=$(grep -q 'bird/' changes.txt && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
-                echo "birdimage-api=$(grep -q 'birdImage/' changes.txt && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
+                echo "birdapi_changed=$(grep -q 'bird/' changes.txt && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
+                echo "birdimageapi_changed=$(grep -q 'birdImage/' changes.txt && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
 
-    build-and-push-image:
+    build-and-push:
         needs: determine-changes
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                api: ['bird-api', 'birdimage-api']
+                api: ['bird', 'birdImage']
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
@@ -74,35 +74,41 @@ jobs:
                 password: ${{ env.DOCKERHUB_TOKEN }}
 
             - name: Build and Push
-              uses: docker/build-push-action@v4
               if: |
-                (matrix.api == 'bird-api' && needs.determine-changes.outputs.bird-api == 'true') ||
-                (matrix.api == 'birdimage-api' && needs.determine-changes.outputs.birdimage-api == 'true')
-              with:
-                context: ./${{ matrix.api }}-api
-                push: true
-                tags: ${{ env.DOCKERHUB_USERNAME }}/${{ matrix.api }}-api:${{ github.sha }}
+                (matrix.api == 'bird' && needs.determine-changes.outputs.birdapi_changed == 'true') ||
+                (matrix.api == 'birdImage' && needs.determine-changes.outputs.birdimageapi_changed == 'true')
+              env:
+                IMAGE_TAG: ${{ github.sha }}
+              run: |
+                cd ${{ matrix.api }}
+                docker build -t ${{ env.DOCKERHUB_USERNAME }}/${{ matrix.api }}:$IMAGE_TAG .
+                docker push ${{ env.DOCKERHUB_USERNAME }}/${{ matrix.api }}:$IMAGE_TAG
 
     deploy:
-        needs: [build-and-push-image, determine-changes]
+        needs: [build-and-push, determine-changes]
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
 
+            - name: Install yq
+              run: |
+                wget https://github.com/mikefarah/yq/releases/download/v4.40.5/yq_linux_amd64 -O /usr/local/bin/yq
+                chmod +x /usr/local/bin/yq
+
             - name: Update Helm chart values
               if: |
-                needs.determine-changes.outputs.bird-api == 'true' ||
-                needs.determine-changes.outputs.birdimage-api == 'true'
+                needs.determine-changes.outputs.birdapi_changed == 'true' ||
+                needs.determine-changes.outputs.birdimageapi_changed == 'true'
               run: |
-                # Update bird-api if changed
-                if [[ "${{ needs.determine-changes.outputs.bird-api }}" == "true" ]]; then
+                # Update birdapi if changed
+                if [[ "${{ needs.determine-changes.outputs.birdapi_changed }}" == "true" ]]; then
                     # Update the image tag in the Helm values
                     yq eval '.image.tag = "${{ github.sha }}"' -i helm-charts/birdapi/values.yaml
                     git add helm-charts/birdapi/values.yaml
 
-                # Update birdimage-api if changed
-                if [[ "${{ needs.determine-changes.outputs.birdimage-api }}" == "true" ]]; then
+                # Update birdimageapi if changed
+                if [[ "${{ needs.determine-changes.outputs.birdimageapi_changed }}" == "true" ]]; then
                     # Update the image tag in the Helm values
                     yq eval '.image.tag = "${{ github.sha }}"' -i helm-charts/birdimageapi/values.yaml
                     git add helm-charts/birdimageapi/values.yaml
