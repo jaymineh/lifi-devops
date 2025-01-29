@@ -151,20 +151,20 @@
       shell: kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=argocd-server -n argocd --timeout=120s
       changed_when: false
 
-    - name: Deploy birdImage API using Helm
-      shell: |
-        helm upgrade --install birdimageapi /home/ubuntu/lifi-devops/helm-charts/birdimageapi/ \
-        --namespace bird \
-        --create-namespace
-      environment:
-        KUBECONFIG: "/etc/rancher/k3s/k3s.yaml"
+    # - name: Deploy birdImage API using Helm
+    #   shell: |
+    #     helm upgrade --install birdimageapi /home/ubuntu/lifi-devops/helm-charts/birdimageapi/ \
+    #     --namespace bird \
+    #     --create-namespace
+    #   environment:
+    #     KUBECONFIG: "/etc/rancher/k3s/k3s.yaml"
 
-    - name: Deploy bird API using Helm
-      shell: |
-        helm upgrade --install birdapi /home/ubuntu/lifi-devops/helm-charts/birdapi/ \
-        --namespace bird \
-      environment:
-        KUBECONFIG: "/etc/rancher/k3s/k3s.yaml"
+    # - name: Deploy bird API using Helm
+    #   shell: |
+    #     helm upgrade --install birdapi /home/ubuntu/lifi-devops/helm-charts/birdapi/ \
+    #     --namespace bird \
+    #   environment:
+    #     KUBECONFIG: "/etc/rancher/k3s/k3s.yaml"
 
     - name: Disable root login via SSH
       lineinfile:

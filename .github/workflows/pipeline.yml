@@ -13,11 +13,6 @@ on:
 env:
     DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
     DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    AWS_REGION: your-aws-region
-    EC2_IP: ${{ secrets.EC2_IP }}
-    SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
 jobs:
     security-scan:
@@ -95,21 +90,48 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
 
-            - name: Download built APIs
-              uses: actions/download-artifact@v3
-              with:
-                name: built-apis
-
-            - name: Update Helm charts
+            - name: Update Helm chart values
+              if: |
+                needs.determine-changes.outputs.bird-api == 'true' ||
+                needs.determine-changes.outputs.birdimage-api == 'true'
               run: |
-                if [ -f built-apis.txt ]; then
-                    while read -r api; do
-                        values_file=
-                        image_tag="${{ github.sha }}"
-                        yq eval ".image.tag = \"$image_tag\"" -i $values_file
-                        yq eval ".image.repository = \"${{ env.DOCKERHUB_USERNAME }}/$api\"" -i $values_file
-                    done < built-apis.txt
+                # Update bird-api if changed
+                if [[ "${{ needs.determine-changes.outputs.bird-api }}" == "true" ]]; then
+                    # Update the image tag in the Helm values
+                    yq eval '.image.tag = "${{ github.sha }}"' -i helm-charts/birdapi/values.yaml
+                    git add helm-charts/birdapi/values.yaml
+
+                # Update birdimage-api if changed
+                if [[ "${{ needs.determine-changes.outputs.birdimage-api }}" == "true" ]]; then
+                    # Update the image tag in the Helm values
+                    yq eval '.image.tag = "${{ github.sha }}"' -i helm-charts/birdimageapi/values.yaml
+                    git add helm-charts/birdimageapi/values.yaml
+
+            - name: Commit and push changes
+              run: |
+                if [[ -n "$(git status --porcelain)" ]]; then
+                    git config --global user.name 'GitHub Actions'
+                    git config --global user.email 'github-actions@github.com'
+                    git commit -m "Update image tags to ${{ github.sha }}"
+                    git push
                 fi
+
+
+            # - name: Download built APIs
+            #   uses: actions/download-artifact@v3
+            #   with:
+            #     name: built-apis
+
+            # - name: Update Helm charts
+            #   run: |
+            #     if [ -f built-apis.txt ]; then
+            #         while read -r api; do
+            #             values_file=
+            #             image_tag="${{ github.sha }}"
+            #             yq eval ".image.tag = \"$image_tag\"" -i $values_file
+            #             yq eval ".image.repository = \"${{ env.DOCKERHUB_USERNAME }}/$api\"" -i $values_file
+            #         done < built-apis.txt
+            #     fi
 
 
 

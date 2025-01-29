@@ -22,13 +22,13 @@
 #   }
 # }
 
-#Create dynamo DB for terraform locks
-resource "aws_dynamodb_table" "lifinance_locks_aws" {
-  name         = "lifinance-locks"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "LockID"
-  attribute {
-    name = "LockID"
-    type = "S"
-  }
-}
+# #Create dynamo DB for terraform locks
+# resource "aws_dynamodb_table" "lifinance_locks_aws" {
+#   name         = "lifinance-locks"
+#   billing_mode = "PAY_PER_REQUEST"
+#   hash_key     = "LockID"
+#   attribute {
+#     name = "LockID"
+#     type = "S"
+#   }
+# }
