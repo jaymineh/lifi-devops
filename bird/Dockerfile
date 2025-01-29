@@ -14,3 +14,4 @@ COPY --from=builder /app/birdApi .
 EXPOSE 4201
 
 CMD ["./birdApi"]
+
