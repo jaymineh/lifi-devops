@@ -118,12 +118,14 @@ jobs:
                     # Update the image tag in the Helm values
                     yq eval '.image.tag = "${{ github.sha }}"' -i helm-charts/birdapi/values.yaml
                     git add helm-charts/birdapi/values.yaml
+                fi
 
 
                 if [[ "${{ needs.determine-changes.outputs.birdimageapi_changed }}" == "true" ]]; then
                     # Update the image tag in the Helm values
                     yq eval '.image.tag = "${{ github.sha }}"' -i helm-charts/birdimageapi/values.yaml
                     git add helm-charts/birdimageapi/values.yaml
+                fi
 
             - name: Commit and push changes
               run: |

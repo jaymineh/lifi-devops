@@ -14,3 +14,4 @@ COPY --from=builder /app/birdImage .
 EXPOSE 4200
 
 CMD ["./birdImage"]
+
