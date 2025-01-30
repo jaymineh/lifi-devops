@@ -119,14 +119,14 @@ jobs:
               run: |
 
                 if [[ "${{ needs.determine-changes.outputs.birdapi_changed }}" == "true" ]]; then
-                    # Update the image tag in the Helm values
+                    # Update the image tag in the Helm values for birdapi
                     yq eval '.image.tag = "${{ github.sha }}"' -i helm-charts/birdapi/values.yaml
                     git add helm-charts/birdapi/values.yaml
                 fi
 
 
                 if [[ "${{ needs.determine-changes.outputs.birdimageapi_changed }}" == "true" ]]; then
-                    # Update the image tag in the Helm values
+                    # Update the image tag in the Helm values for birdimageapi
                     yq eval '.image.tag = "${{ github.sha }}"' -i helm-charts/birdimageapi/values.yaml
                     git add helm-charts/birdimageapi/values.yaml
                 fi
