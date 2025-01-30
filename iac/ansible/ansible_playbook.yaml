@@ -185,7 +185,6 @@
       environment:
         ARGOCD_SERVER: "{{ ec2_ip.stdout }}:30005"
       register: argocd_token
-      no_log: true
 
     - name: Display Token
       debug:
