@@ -158,6 +158,20 @@ jobs:
                     git push
                 fi
 
+            - name: Trigger ArgoCD sync
+              run: |
+                if [[ "${{ needs.determine-changes.outputs.birdapi_changed }}" == "true" ]]; then
+                  curl -sS -k -X POST \
+                    -H "Authorization: Bearer ${{ env.ARGOCD_TOKEN }}" \
+                    "${{ env.ARGOCD_SERVER }}/api/v1/applications/birdapi/sync"
+                fi
+
+                if [[ "${{ needs.determine-changes.outputs.birdimageapi_changed }}" == "true" ]]; then
+                  curl -sS -k -X POST \
+                    -H "Authorization: Bearer ${{ env.ARGOCD_TOKEN }}" \
+                    "${{ env.ARGOCD_SERVER }}/api/v1/applications/birdimageapi/sync"
+                fi
+
 
             # - name: Download built APIs
             #   uses: actions/download-artifact@v3

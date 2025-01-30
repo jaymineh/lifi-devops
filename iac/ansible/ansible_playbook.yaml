@@ -175,7 +175,7 @@
       register: ec2_ip
       changed_when: false
 
-    - name: Generate ArgoCD Token
+    - name: Generate ArgoCD Token with Correct IP
       shell: |
         argocd login $ARGOCD_SERVER \
           --username admin \
@@ -192,21 +192,6 @@
         msg: |
           Add this token to GitHub Secrets as ARGOCD_TOKEN:
           {{ argocd_token.stdout }}
-
-    - name: Trigger ArgoCD sync
-      run: |
-        if [[ "${{ needs.determine-changes.outputs.birdapi_changed }}" == "true" ]]; then
-          curl -sS -k -X POST \
-            -H "Authorization: Bearer ${{ env.ARGOCD_TOKEN }}" \
-            "${{ env.ARGOCD_SERVER }}/api/v1/applications/birdapi/sync"
-        fi
-
-        if [[ "${{ needs.determine-changes.outputs.birdimageapi_changed }}" == "true" ]]; then
-          curl -sS -k -X POST \
-            -H "Authorization: Bearer ${{ env.ARGOCD_TOKEN }}" \
-            "${{ env.ARGOCD_SERVER }}/api/v1/applications/birdimageapi/sync"
-        fi
-
         
     # - name: Deploy birdImage API using Helm
     #   shell: |
