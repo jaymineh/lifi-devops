@@ -15,4 +15,3 @@ EXPOSE 4201
 
 CMD ["./birdApi"]
 
-
