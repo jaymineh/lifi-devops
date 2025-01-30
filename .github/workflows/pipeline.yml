@@ -61,28 +61,38 @@ jobs:
         strategy:
             matrix:
                 api: ['bird', 'birdImage']
+        if: |
+          (matrix.api == 'bird' && needs.determine-changes.outputs.birdapi_changed == 'true') ||
+          (matrix.api == 'birdImage' && needs.determine-changes.outputs.birdimageapi_changed == 'true')
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
-              if: ${{ needs.determine-changes.outputs[format('{0}_changed', matrix.api)] == 'true' }}
 
             - name: Set up QEMU
               uses: docker/setup-qemu-action@v2
-              if: ${{ needs.determine-changes.outputs[format('{0}_changed', matrix.api)] == 'true' }}
+              if: |
+                (matrix.api == 'bird' && needs.determine-changes.outputs.birdapi_changed == 'true') ||
+                (matrix.api == 'birdImage' && needs.determine-changes.outputs.birdimageapi_changed == 'true')
 
             - name: Set up Docker Buildx
               uses: docker/setup-buildx-action@v2
-              if: ${{ needs.determine-changes.outputs[format('{0}_changed', matrix.api)] == 'true' }}
+              if: |
+                (matrix.api == 'bird' && needs.determine-changes.outputs.birdapi_changed == 'true') ||
+                (matrix.api == 'birdImage' && needs.determine-changes.outputs.birdimageapi_changed == 'true')
 
             - name: Login to Docker Hub
               uses: docker/login-action@v2
-              if: ${{ needs.determine-changes.outputs[format('{0}_changed', matrix.api)] == 'true' }}
+              if: |
+                (matrix.api == 'bird' && needs.determine-changes.outputs.birdapi_changed == 'true') ||
+                (matrix.api == 'birdImage' && needs.determine-changes.outputs.birdimageapi_changed == 'true')
               with:
                 username: ${{ env.DOCKERHUB_USERNAME }}
                 password: ${{ env.DOCKERHUB_TOKEN }}
 
             - name: Build and Push
-              if: ${{ needs.determine-changes.outputs[format('{0}_changed', matrix.api)] == 'true' }}
+              if: |
+                (matrix.api == 'bird' && needs.determine-changes.outputs.birdapi_changed == 'true') ||
+                (matrix.api == 'birdImage' && needs.determine-changes.outputs.birdimageapi_changed == 'true')
               env:
                 IMAGE_TAG: ${{ github.sha }}
               run: |
