@@ -44,22 +44,36 @@ jobs:
         steps:
             - uses: actions/checkout@v4
               with:
-                fetch-depth: 2
+                fetch-depth: 0
 
             - name: Check for changes
               id: check_changes
               run: |
                 git diff --name-only HEAD^ HEAD > changes.txt
-                birdapi_changed=$(grep -q 'bird/' changes.txt && echo 'true' || echo 'false')
-                birdimageapi_changed=$(grep -q 'birdImage/' changes.txt && echo 'true' || echo 'false')
+                echo "Changed files:"
+                cat changes.txt
+                birdapi_changed=$(grep -q '^bird/' changes.txt && echo 'true' || echo 'false')
+                birdimageapi_changed=$(grep -q '^birdImage/' changes.txt && echo 'true' || echo 'false')
+                echo "Debug: Bird API changed: $birdapi_changed"
+                echo "Debug: BirdImage API changed: $birdimageapi_changed"
                 echo "birdapi_changed=$birdapi_changed" >> $GITHUB_OUTPUT
                 echo "birdimageapi_changed=$birdimageapi_changed" >> $GITHUB_OUTPUT
+
+            - name: Debug Outputs
+              run: |
+                echo "Outputs set in GITHUB_OUTPUT:"
+                cat $GITHUB_OUTPUT
 
     build-bird:
         needs: determine-changes
         runs-on: ubuntu-latest
         if: needs.determine-changes.outputs.birdapi_changed == 'true'
         steps:
+
+            - name: Debug Condition
+              run: |
+                echo "BIRD API changed value: ${{ needs.determine-changes.outputs.birdapi_changed }}"
+
             - name: Checkout code
               uses: actions/checkout@v4
 
@@ -81,6 +95,10 @@ jobs:
         runs-on: ubuntu-latest
         if: needs.determine-changes.outputs.birdapi_changed == 'true'
         steps:
+            - name: Debug Condition
+              run: |
+                echo "BIRD API changed value: ${{ needs.determine-changes.outputs.birdapi_changed }}"
+
             - name: Checkout code
               uses: actions/checkout@v4
 
