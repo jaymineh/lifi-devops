@@ -3,19 +3,19 @@ variable "aws_region" {
 	default = "us-east-1"
 }
 
-variable "allowed_ssh_cidr" {
-  description = "CIDR block to allow SSH access"
-}
+# variable "allowed_ssh_cidr" {
+#   description = "CIDR block to allow SSH access"
+# }
 
 variable "ami_id" {
   description = "AMI ID for the EC2 instance"
   default = "ami-0e86e20dae9224db8"
 }
 
-variable "github_repo" {
-  description = "Github repo to clone"
-	type        = string
-}
+# variable "github_repo" {
+#   description = "Github repo to clone"
+# 	type        = string
+# }
 
 variable "ssh_key_path" {
     default = "C:/Users/jemin/Downloads/devops.pem"

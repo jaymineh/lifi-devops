@@ -50,8 +50,8 @@ resource "aws_security_group" "lifinance_sg" {
   }
 
   ingress {
-    from_port   = 30005
-    to_port     = 30005
+    from_port   = 30080
+    to_port     = 30080
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow HTTP traffic for ArgoCD"

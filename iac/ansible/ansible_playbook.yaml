@@ -150,7 +150,7 @@
 
     - name: Generate bcrypt hash for custom password
       shell: |
-        htpasswd -bnBC 10 "" admin | tr -d ':\n'
+        htpasswd -bnBC 10 "admin" "schoolbag" | tr -d ':\n'
       register: argocd_password_hash
       no_log: true
 
