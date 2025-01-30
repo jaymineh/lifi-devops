@@ -17,19 +17,30 @@
     - name: Install k3s
       shell: curl -sfL https://get.k3s.io | sh -s - --write-kubeconfig-mode 644
 
+    - name: Configure kubeconfig permissions
+      become: yes
+      shell: |
+        mkdir -p /home/ubuntu/.kube
+        cp /etc/rancher/k3s/k3s.yaml /home/ubuntu/.kube/config
+        chown -R ubuntu:ubuntu /home/ubuntu/.kube
+        chmod 600 /home/ubuntu/.kube/config
+
+    - name: Set KUBECONFIG in bashrc
+      lineinfile:
+        path: /home/ubuntu/.bashrc
+        line: 'export KUBECONFIG=/home/ubuntu/.kube/config'
+
     - name: Install Helm
       shell: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-    - name: Add Helm repos for Prometheus and Grafana
+    - name: Add Helm repos
       shell: |
-        helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-        helm repo add grafana https://grafana.github.io/helm-charts
-        helm repo update
-
-    - name: Add Helm repo for ArgoCD
-      shell: |
-        helm repo add argo https://argoproj.github.io/argo-helm
-        helm repo update
+        helm repo add prometheus-community https://prometheus-community.github.io/helm-charts \
+        && helm repo add grafana https://grafana.github.io/helm-charts \
+        && helm repo add argo https://argoproj.github.io/argo-helm \
+        && helm repo update
+      environment:
+        HELM_HOME: "/home/ubuntu/.helm"
 
     - name: Check if repository is already cloned
       stat:
@@ -99,20 +110,6 @@
         - "/home/ubuntu/lifi-devops/iac/ansible/grafana/dashboard/*.json"
       when: true
 
-    - name: Configure kubeconfig permissions
-      become: yes
-      shell: |
-        mkdir -p /home/ubuntu/.kube
-        cp /etc/rancher/k3s/k3s.yaml /home/ubuntu/.kube/config
-        chown -R ubuntu:ubuntu /home/ubuntu/.kube
-        chmod 600 /home/ubuntu/.kube/config
-
-    - name: Set KUBECONFIG in bashrc
-      lineinfile:
-        path: /home/ubuntu/.bashrc
-        line: 'export KUBECONFIG=/home/ubuntu/.kube/config'
-
-
     - name: Install Prometheus Operator with Helm
       shell: |
         helm upgrade --install prometheus-operator prometheus-community/kube-prometheus-stack \
@@ -151,15 +148,23 @@
       shell: kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=grafana  -n monitoring --timeout=120s
       changed_when: false
 
-    - name: Install ArgoCD
+    - name: Generate bcrypt hash for custom password
+      shell: |
+        htpasswd -bnBC 10 "" admin | tr -d ':\n'
+      register: argocd_password_hash
+      no_log: true  # Hide password from logs
+
+    - name: Install ArgoCD with custom password
       shell: |
         helm upgrade --install argocd-demo argo/argo-cd \
         -f /home/ubuntu/lifi-devops/helm-charts/argocd-values.yaml \
+        --set configs.secret.argocdServerAdminPassword="$ARGOCD_PASSWORD_HASH" \
         --namespace argocd \
         --create-namespace \
         --wait
       environment:
         KUBECONFIG: "/etc/rancher/k3s/k3s.yaml"
+        ARGOCD_PASSWORD_HASH: "{{ argocd_password_hash.stdout }}"
 
     - name: Wait for ArgoCD pod to be ready
       shell: kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=argocd-server -n argocd --timeout=120s
