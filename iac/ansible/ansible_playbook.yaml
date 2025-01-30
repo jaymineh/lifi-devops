@@ -170,6 +170,24 @@
       shell: kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=argocd-server -n argocd --timeout=120s
       changed_when: false
 
+    - name: Generate ArgoCD API Token
+      shell:
+        argocd login $ARGOCD_SERVER \
+        --username admin \
+        --password schoolbag \
+        --grpc-web --insecure
+        argocd account generate-token
+      environment:
+        ARGOCD_SERVER: "localhost:30005"
+      register: argocd_token_output
+      no_log: true
+
+    - name: Display Token for GitHub Secrets
+      debug:
+        msg: |
+          Add this token to GitHub Secrets as ARGOCD_TOKEN:
+          {{ argocd_token_output.stdout }}
+        
     # - name: Deploy birdImage API using Helm
     #   shell: |
     #     helm upgrade --install birdimageapi /home/ubuntu/lifi-devops/helm-charts/birdimageapi/ \
