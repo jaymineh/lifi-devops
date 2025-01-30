@@ -1,5 +1,7 @@
+# argocd-values.yaml
 server:
   service:
     type: NodePort
-    nodePorts:
-      https: 30005
+    nodePort: 30005
+  extraArgs:
+    - --insecure

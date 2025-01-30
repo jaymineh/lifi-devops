@@ -99,6 +99,20 @@
         - "/home/ubuntu/lifi-devops/iac/ansible/grafana/dashboard/*.json"
       when: true
 
+    - name: Configure kubeconfig permissions
+      become: yes
+      shell: |
+        mkdir -p /home/ubuntu/.kube
+        cp /etc/rancher/k3s/k3s.yaml /home/ubuntu/.kube/config
+        chown -R ubuntu:ubuntu /home/ubuntu/.kube
+        chmod 600 /home/ubuntu/.kube/config
+
+    - name: Set KUBECONFIG in bashrc
+      lineinfile:
+        path: /home/ubuntu/.bashrc
+        line: 'export KUBECONFIG=/home/ubuntu/.kube/config'
+
+
     - name: Install Prometheus Operator with Helm
       shell: |
         helm upgrade --install prometheus-operator prometheus-community/kube-prometheus-stack \
