@@ -1,25 +1,22 @@
 replicaCount: 2
 image:
   repository: jaymineh/birdapi
-  tag: 0.7
+  tag: 2a8c5e6451f4d19716f379b9430c4314985cc4a4
   pullPolicy: Always
 service:
   type: NodePort
   port: 4201
   targetPort: 30001
-
 serviceAccount:
-  create: true 
+  create: true
   name: birdapi-sa
   annotations: {}
   automount: true
-
 autoscaling:
   enabled: true
   minReplicas: 1
   maxReplicas: 3
   targetCPUUtilizationPercentage: 80
   targetMemoryUtilizationPercentage: 70
-
 ingress:
   enabled: false
