@@ -152,7 +152,7 @@
       shell: |
         htpasswd -bnBC 10 "" admin | tr -d ':\n'
       register: argocd_password_hash
-      no_log: true  # Hide password from logs
+      no_log: true
 
     - name: Install ArgoCD with custom password
       shell: |
@@ -170,23 +170,43 @@
       shell: kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=argocd-server -n argocd --timeout=120s
       changed_when: false
 
-    - name: Generate ArgoCD API Token
-      shell:
+    - name: Get EC2 Public IP
+      shell: curl -s http://169.254.169.254/latest/meta-data/public-ipv4
+      register: ec2_ip
+      changed_when: false
+
+    - name: Generate ArgoCD Token
+      shell: |
         argocd login $ARGOCD_SERVER \
-        --username admin \
-        --password schoolbag \
-        --grpc-web --insecure
+          --username admin \
+          --password admin \
+          --grpc-web --insecure
         argocd account generate-token
       environment:
-        ARGOCD_SERVER: "localhost:30005"
-      register: argocd_token_output
+        ARGOCD_SERVER: "{{ ec2_ip.stdout }}:30005"
+      register: argocd_token
       no_log: true
 
-    - name: Display Token for GitHub Secrets
+    - name: Display Token
       debug:
         msg: |
           Add this token to GitHub Secrets as ARGOCD_TOKEN:
-          {{ argocd_token_output.stdout }}
+          {{ argocd_token.stdout }}
+
+    - name: Trigger ArgoCD sync
+      run: |
+        if [[ "${{ needs.determine-changes.outputs.birdapi_changed }}" == "true" ]]; then
+          curl -sS -k -X POST \
+            -H "Authorization: Bearer ${{ env.ARGOCD_TOKEN }}" \
+            "${{ env.ARGOCD_SERVER }}/api/v1/applications/birdapi/sync"
+        fi
+
+        if [[ "${{ needs.determine-changes.outputs.birdimageapi_changed }}" == "true" ]]; then
+          curl -sS -k -X POST \
+            -H "Authorization: Bearer ${{ env.ARGOCD_TOKEN }}" \
+            "${{ env.ARGOCD_SERVER }}/api/v1/applications/birdimageapi/sync"
+        fi
+
         
     # - name: Deploy birdImage API using Helm
     #   shell: |

@@ -15,3 +15,4 @@ EXPOSE 4200
 
 CMD ["./birdImage"]
 
+
