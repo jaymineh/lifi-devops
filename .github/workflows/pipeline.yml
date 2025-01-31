@@ -158,6 +158,10 @@ jobs:
                     git push
                 fi
 
+            - name: Bootstrap ArgoCD Applications
+              run: |
+                kubectl apply -f argocd/root-application.yaml
+
             - name: Trigger ArgoCD sync
               run: |
                 if [[ "${{ needs.determine-changes.outputs.birdapi_changed }}" == "true" ]]; then

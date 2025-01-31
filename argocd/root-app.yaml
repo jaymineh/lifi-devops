@@ -1,25 +1,18 @@
+# argocd/root-application.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: birdimageapi
+  name: root-application
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: https://github.com/jaymineh/lifi-devops.git
     targetRevision: main
-    path: helm-charts/birdimageapi
-    helm:
-      values: |
-        ingress:
-          enabled: false
-        autoscaling:
-          enabled: true
-          minReplicas: 1
-          maxReplicas: 3
+    path: argocd
   destination:
     server: https://kubernetes.default.svc
-    namespace: bird
+    namespace: argocd
   syncPolicy:
     automated:
       prune: true
