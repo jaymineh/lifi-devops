@@ -175,22 +175,36 @@
       register: ec2_ip
       changed_when: false
 
+    - name: Install ArgoCD CLI
+      shell: |
+        curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+        chmod +x /usr/local/bin/argocd
+
+    - name: Update admin policy to allow API key generation
+      shell: |
+        kubectl patch configmap argocd-cm -n argocd --type merge -p '{"data": {"accounts.admin": "apiKey"}}'
+      changed_when: false
+
+    - name: Wait for ArgoCD to apply configuration changes
+      shell: sleep 10
+      changed_when: false
+
     - name: Generate ArgoCD Token with Correct IP
       shell: |
         argocd login $ARGOCD_SERVER \
           --username admin \
-          --password admin \
-          --grpc-web --insecure
-        argocd account generate-token
+          --password schoolbag \
+          --grpc-web \
+          --insecure >/dev/null 2>&1  # Silence login output
+        argocd account generate-token | awk '/^eyJ/{printf "%s", $0}'
       environment:
-        ARGOCD_SERVER: "{{ ec2_ip.stdout }}:30005"
+        ARGOCD_SERVER: "{{ ec2_ip.stdout }}:30080"
       register: argocd_token
 
     - name: Display Token
       debug:
-        msg: |
-          Add this token to GitHub Secrets as ARGOCD_TOKEN:
-          {{ argocd_token.stdout }}
+        msg: "ARGOCD_TOKEN: {{ argocd_token.stdout | replace('\n','') | trim }}"
+      when: argocd_token is success
         
     # - name: Deploy birdImage API using Helm
     #   shell: |

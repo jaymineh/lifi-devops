@@ -3,9 +3,9 @@ variable "aws_region" {
 	default = "us-east-1"
 }
 
-# variable "allowed_ssh_cidr" {
-#   description = "CIDR block to allow SSH access"
-# }
+variable "allowed_ssh_cidr" {
+  description = "CIDR block to allow SSH access"
+}
 
 variable "ami_id" {
   description = "AMI ID for the EC2 instance"
