@@ -1,7 +1,7 @@
 replicaCount: 2
 image:
   repository: jaymineh/birdimage
-  tag: 558b29dbf56e6cabdb42052e7e77f17cc36e2bba
+  tag: ee9d233b6dc8de9e06c7ad6bf66932161bc746b8
   pullPolicy: Always
 service:
   type: NodePort
