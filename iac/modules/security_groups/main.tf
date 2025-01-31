@@ -57,6 +57,14 @@ resource "aws_security_group" "lifinance_sg" {
     description = "Allow HTTP traffic for ArgoCD"
   }
 
+  ingress {
+    from_port   = 6443
+    to_port     = 6443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow traffic for Kubernetes API"
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
