@@ -160,7 +160,7 @@ jobs:
 
             - name: Bootstrap ArgoCD Applications
               run: |
-                kubectl apply -f argocd/root-application.yaml
+                kubectl apply -f argocd/root-app.yaml
 
             - name: Trigger ArgoCD sync
               run: |
