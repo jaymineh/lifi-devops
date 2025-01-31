@@ -5,6 +5,11 @@ RUN go mod download
 COPY . .
 RUN go build -o birdImage
 
+
+# FROM alpine:3.18
+# RUN addgroup -S birdimageapi && adduser -S birdimageapi -G birdimageapi
+# USER birdimageapi
+
 FROM alpine:3.18
 RUN addgroup -S birdimageapi && adduser -S birdimageapi -G birdimageapi
 USER birdimageapi
@@ -12,6 +17,7 @@ USER birdimageapi
 WORKDIR /app
 COPY --from=builder /app/birdImage .
 EXPOSE 4200
+
 
 CMD ["./birdImage"]
 
