@@ -171,9 +171,11 @@
       changed_when: false
 
     - name: Get EC2 Public IP
-      shell: curl -s http://169.254.169.254/latest/meta-data/public-ipv4
+      shell: curl -s ifconfig.me
       register: ec2_ip
       changed_when: false
+
+    - name: Display EC2 Public IP
       debug:
         msg: "EC2 Public IP: {{ ec2_ip.stdout }}"
   

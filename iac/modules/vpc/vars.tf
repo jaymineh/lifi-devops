@@ -7,3 +7,9 @@ variable "public_subnet_cidr" {
   description = "CIDR block for the public subnet"
   default = "10.0.2.0.0/24"
 }
+
+variable "availability_zone" {
+  description = "Availability Zone to launch the instance in"
+  type        = string
+  default     = "us-east-1a"
+}

@@ -5,6 +5,7 @@ resource "aws_instance" "lifinance" {
   security_groups = [var.security_group_id]
 	key_name = var.key_name
   associate_public_ip_address = true
+  availability_zone = var.availability_zone
   user_data = <<-EOF
     #!/bin/bash
     sudo apt update && sudo apt upgrade -y
