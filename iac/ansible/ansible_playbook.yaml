@@ -179,7 +179,6 @@
       debug:
         msg: "EC2 Public IP: {{ ec2_ip.stdout }}"
   
-
     - name: Install ArgoCD CLI
       shell: |
         curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
@@ -200,11 +199,16 @@
           --username admin \
           --password schoolbag \
           --grpc-web \
-          --insecure >/dev/null 2>&1  # Silence login output
+          --insecure
+          -y | cat
         argocd account generate-token | awk '/^eyJ/{printf "%s", $0}'
       environment:
         ARGOCD_SERVER: "{{ ec2_ip.stdout }}:30080"
       register: argocd_token
+
+    - name: Debug ArgoCD
+      debug:
+        var: argocd_token
 
     - name: Display Token
       debug:
