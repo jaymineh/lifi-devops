@@ -107,6 +107,3 @@ func main() {
 	http.Handle("/metrics", promhttp.Handler())
 	http.ListenAndServe(":4200", nil)
 }
-
-
-// nuxt
