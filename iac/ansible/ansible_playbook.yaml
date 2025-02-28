@@ -148,27 +148,56 @@
       shell: kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=grafana  -n monitoring --timeout=120s
       changed_when: false
 
-    - name: Generate bcrypt hash for custom password
-      shell: |
-        htpasswd -bnBC 10 "admin" "schoolbag" | tr -d ':\n'
-      register: argocd_password_hash
-      no_log: true
-
-    - name: Install ArgoCD with custom password
+    - name: Install ArgoCD
       shell: |
         helm upgrade --install argocd-demo argo/argo-cd \
         -f /home/ubuntu/lifi-devops/helm-charts/argocd-values.yaml \
-        --set configs.secret.argocdServerAdminPassword="$ARGOCD_PASSWORD_HASH" \
         --namespace argocd \
         --create-namespace \
         --wait
       environment:
         KUBECONFIG: "/etc/rancher/k3s/k3s.yaml"
-        ARGOCD_PASSWORD_HASH: "{{ argocd_password_hash.stdout }}"
 
     - name: Wait for ArgoCD pod to be ready
       shell: kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=argocd-server -n argocd --timeout=120s
       changed_when: false
+
+    # Config to hide argocd password
+  vars_prompt:
+    - name: argocd_admin_password
+      prompt: "Enter ArgoCD admin password"
+      private: yes
+      confirm: yes
+
+  tasks:
+    - name: Generate bcrypt hash for ArgoCD password
+      shell: |
+        htpasswd -bnBC 10 "" "{{ argocd_admin_password | quote }}" | tr -d ':\n' | sed 's/$2y/$2a/'
+      register: argocd_password_hash
+      no_log: true
+
+    - name: Set custom ArgoCD password
+      shell: |
+        kubectl -n argocd patch secret argocd-secret \
+          -p '{"stringData": {
+                "admin.password": "{{ argocd_password_hash.stdout }}",
+                "admin.passwordMtime": "{{ ansible_date_time.iso8601 }}"
+              }}'
+      environment:
+        KUBECONFIG: "/etc/rancher/k3s/k3s.yaml"
+      no_log: true
+
+    # - name: Install ArgoCD with custom password
+    #   shell: |
+    #     helm upgrade --install argocd-demo argo/argo-cd \
+    #     -f /home/ubuntu/lifi-devops/helm-charts/argocd-values.yaml \
+    #     --set configs.secret.argocdServerAdminPassword="$ARGOCD_PASSWORD_HASH" \
+    #     --namespace argocd \
+    #     --create-namespace \
+    #     --wait
+    #   environment:
+    #     KUBECONFIG: "/etc/rancher/k3s/k3s.yaml"
+    #     ARGOCD_PASSWORD_HASH: "{{ argocd_password_hash.stdout }}"
 
     - name: Get EC2 Public IP
       shell: curl -s ifconfig.me
@@ -195,21 +224,17 @@
 
     - name: Generate ArgoCD Token with Correct IP
       shell: |
-        argocd login $ARGOCD_SERVER \
+        argocd login {{ ec2_ip.stdout }}:30080 \
           --username admin \
-          --grpc-web \
-          --insecure
-          -y >/dev/null 2>&1
-        argocd account generate-token | awk '/^eyJ/{printf "%s", $0}'
-      environment:
-        ARGOCD_SERVER: "{{ ec2_ip.stdout }}:30080"
+          --password "{{ argocd_admin_password | quote }}" \
+          --plaintext > /dev/null 2>&1
+        argocd account generate-token
       register: argocd_token
 
-    - name: Set custom ArgoCD password
-      shell: |
-        kubectl -n argocd patch secret argocd-secret \
-        -p '{"stringData": {"admin.password": "'$(htpasswd -bnBC 10 "" <adminpwd> | tr -d ':\n' | sed 's/$2y/$2a/')'", "admin.passwordMtime": "'$(date +%FT%T%Z)'"}}'
-      # replace <adminpwd> with your own password
+    - name: Display Token
+      debug:
+        msg: "ARGOCD_TOKEN: {{ argocd_token.stdout | regex_search('eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+') }}"
+      when: argocd_token is success
         
     # - name: Deploy birdImage API using Helm
     #   shell: |
