@@ -197,23 +197,19 @@
       shell: |
         argocd login $ARGOCD_SERVER \
           --username admin \
-          --password schoolbag \
           --grpc-web \
           --insecure
-          -y | cat
+          -y >/dev/null 2>&1
         argocd account generate-token | awk '/^eyJ/{printf "%s", $0}'
       environment:
         ARGOCD_SERVER: "{{ ec2_ip.stdout }}:30080"
       register: argocd_token
 
-    - name: Debug ArgoCD
-      debug:
-        var: argocd_token
-
-    - name: Display Token
-      debug:
-        msg: "ARGOCD_TOKEN: {{ argocd_token.stdout | replace('\n','') | trim }}"
-      when: argocd_token is success
+    - name: Set custom ArgoCD password
+      shell: |
+        kubectl -n argocd patch secret argocd-secret \
+        -p '{"stringData": {"admin.password": "'$(htpasswd -bnBC 10 "" <adminpwd> | tr -d ':\n' | sed 's/$2y/$2a/')'", "admin.passwordMtime": "'$(date +%FT%T%Z)'"}}'
+      # replace <adminpwd> with your own password
         
     # - name: Deploy birdImage API using Helm
     #   shell: |
