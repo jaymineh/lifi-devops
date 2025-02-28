@@ -1,3 +1,4 @@
+#FROM node18
 FROM golang:1.22.5-alpine AS builder
 WORKDIR /app
 COPY go.mod go.sum ./

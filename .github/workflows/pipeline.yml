@@ -161,6 +161,12 @@ jobs:
                     git push
                 fi
 
+            - name: Setup kubeconfig
+              run: |
+                mkdir -p $HOME/.kube
+                echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+                chmod 600 $HOME/.kube/config
+
             - name: Bootstrap ArgoCD Applications
               run: |
                 kubectl config set-cluster default \
