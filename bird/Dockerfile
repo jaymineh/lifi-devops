@@ -3,6 +3,7 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
+
 RUN go build -o birdApi
 
 FROM alpine:3.18
@@ -14,3 +15,5 @@ COPY --from=builder /app/birdApi .
 EXPOSE 4201
 
 CMD ["./birdApi"]
+
+# FROM
